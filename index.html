@@ -101,10 +101,9 @@
   </div>
 
   <script>
-    // 1. إعداد Supabase
     const supabaseUrl = 'https://evkjkupolspmyaygtppb.supabase.co';
     const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2a2prdXBvbHNwbXlheWd0cHBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMxMTUxMDAsImV4cCI6MjA2ODY5MTEwMH0.Mf2ZzhG84cYufTN2Z8AaK1ylxxzAMUPiWTG7aP_clI4';
-    const client = supabase.createClient(supabaseUrl, supabaseKey);
+    const client = window.supabase.createClient(supabaseUrl, supabaseKey);
 
     const form = document.getElementById('donationForm');
     const tableBody = document.querySelector('#donationTable tbody');
@@ -113,9 +112,8 @@
     const topBranch = document.getElementById('topBranch');
     let donations = [];
 
-    // 2. تحميل التبرعات من Supabase
     async function loadDonations() {
-      const { data, error } = await supabase.from('donations').select('*');
+      const { data, error } = await client.from('donations').select('*');
       if (error) {
         alert('خطأ في تحميل التبرعات: ' + error.message);
         return;
@@ -127,7 +125,6 @@
       updateTopStats();
     }
 
-    // 3. عند إرسال النموذج
     form.addEventListener('submit', async function(e) {
       e.preventDefault();
       const donation = {
@@ -139,7 +136,7 @@
         date: document.getElementById('date').value,
       };
 
-      const { error } = await supabase.from('donations').insert([donation]);
+      const { error } = await client.from('donations').insert([donation]);
       if (error) {
         alert('خطأ أثناء الحفظ: ' + error.message);
         return;
@@ -153,7 +150,6 @@
       form.reset();
     });
 
-    // 4. تحديث الجدول
     function updateTable() {
       tableBody.innerHTML = '';
       donations.forEach(d => {
@@ -163,7 +159,6 @@
       });
     }
 
-    // 5. رسم بياني
     function updateChart() {
       const ctx = document.getElementById('donationChart').getContext('2d');
       const typeCounts = { مالي: 0, عيني: 0 };
@@ -183,7 +178,6 @@
       });
     }
 
-    // 6. تفصيل حسب الفروع
     function updateBranchSummary() {
       const summary = {};
       donations.forEach(d => {
@@ -208,7 +202,6 @@
       }
     }
 
-    // 7. أعلى المتبرعين والفروع
     function updateTopStats() {
       const donorTotals = {};
       const branchTotals = {};
@@ -228,7 +221,6 @@
       topBranch.innerText = topB ? `أكبر فرع: ${topB[0]} (${topB[1].toFixed(2)} جنيه)` : '';
     }
 
-    // أول تحميل
     loadDonations();
   </script>
 
