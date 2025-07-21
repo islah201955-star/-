@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Donation Tracker</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; }
+    h1 { color: #2c3e50; }
+    .form-section, .report-section, .summary-section, .top-section {
+      background: #fff; padding: 20px; margin-bottom: 20px;
+      border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label { display: block; margin-top: 10px; }
+    input, select, textarea { width: 100%; padding: 8px; margin-top: 5px; border-radius: 5px; border: 1px solid #ccc; }
+    button { padding: 10px 15px; background: #3498db; color: #fff; border: none; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 10px; border: 1px solid #ddd; text-align: center; }
+    canvas { margin-top: 30px; }
+    .summary-section ul, .top-section ul { list-style: none; padding: 0; }
+    .summary-section li, .top-section li { margin: 10px 0; line-height: 1.6; }
+  </style>
+</head>
+<body>
+  <h1>برنامج تتبع التبرعات</h1>
+
+  <div class="form-section">
+    <h2>إدخال تبرع جديد</h2>
+    <form id="donationForm">
+      <label>اسم المتبرع:</label>
+      <input type="text" id="donorName" required />
+
+      <label>نوع التبرع:</label>
+      <select id="donationType">
+        <option value="مالي">مالي</option>
+        <option value="عيني">عيني</option>
+      </select>
+
+      <label>القيمة / الوصف:</label>
+      <textarea id="donationValue" required></textarea>
+
+      <label>طريقة الدفع:</label>
+      <select id="paymentMethod">
+        <option value="كاش">كاش</option>
+        <option value="تحويل">تحويل</option>
+        <option value="شيك">شيك</option>
+        <option value="مصروف">مصروف</option>
+      </select>
+
+      <label>الفرع:</label>
+      <select id="branch">
+        <option value="حي مكة">حي مكة</option>
+        <option value="أبراج الجامعة">أبراج الجامعة</option>
+        <option value="المنيا الجديدة">المنيا الجديدة</option>
+        <option value="فرع سمالوط">فرع سمالوط</option>
+      </select>
+
+      <label>التاريخ:</label>
+      <input type="date" id="date" required />
+
+      <button type="submit">حفظ التبرع</button>
+    </form>
+  </div>
+
+  <div class="report-section">
+    <h2>سجل التبرعات</h2>
+    <table id="donationTable">
+      <thead>
+        <tr>
+          <th>المتبرع</th>
+          <th>النوع</th>
+          <th>القيمة / الوصف</th>
+          <th>الدفع</th>
+          <th>الفرع</th>
+          <th>التاريخ</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <canvas id="donationChart" width="400" height="200"></canvas>
+  </div>
+
+  <div class="summary-section">
+    <h2>تفصيل التبرعات لكل فرع</h2>
+    <ul id="branchSummary"></ul>
+  </div>
+
+  <div class="top-section">
+    <h2>أعلى المتبرعين والفروع</h2>
+    <ul>
+      <li id="topDonor">أعلى متبرع: </li>
+      <li id="topBranch">أعلى فرع: </li>
+    </ul>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    const form = document.getElementById('donationForm');
+    const tableBody = document.querySelector('#donationTable tbody');
+    const summaryList = document.getElementById('branchSummary');
+    const topDonorEl = document.getElementById('topDonor');
+    const topBranchEl = document.getElementById('topBranch');
+    const donations = [];
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const donation = {
+        donor: document.getElementById('donorName').value,
+        type: document.getElementById('donationType').value,
+        value: document.getElementById('donationValue').value,
+        payment: document.getElementById('paymentMethod').value,
+        branch: document.getElementById('branch').value,
+        date: document.getElementById('date').value
+      };
+
+      donations.push(donation);
+      updateTable();
+      updateChart();
+      updateBranchSummary();
+      updateTopStats();
+      form.reset();
+    });
+
+    function updateTable() {
+      tableBody.innerHTML = '';
+      donations.forEach(d => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${d.donor}</td><td>${d.type}</td><td>${d.value}</td><td>${d.payment}</td><td>${d.branch}</td><td>${d.date}</td>`;
+        tableBody.appendChild(row);
+      });
+    }
+
+    function updateChart() {
+      const ctx = document.getElementById('donationChart').getContext('2d');
+      const typeCounts = { مالي: 0, عيني: 0 };
+      donations.forEach(d => { typeCounts[d.type]++; });
+
+      if (window.chart) window.chart.destroy();
+      window.chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['مالي', 'عيني'],
+          datasets: [{
+            label: 'أنواع التبرعات',
+            data: [typeCounts.مالي, typeCounts.عيني],
+            backgroundColor: ['#2ecc71', '#e67e22']
+          }]
+        }
+      });
+    }
+
+    function updateBranchSummary() {
+      const branches = ['حي مكة', 'أبراج الجامعة', 'المنيا الجديدة', 'فرع سمالوط'];
+      const summary = {};
+
+      branches.forEach(branch => {
+        summary[branch] = {
+          total: 0,
+          كاش: 0,
+          تحويل: 0,
+          شيك: 0,
+          مصروف: 0
+        };
+      });
+
+      donations.forEach(d => {
+        if (d.type === 'مالي') {
+          const amount = parseFloat(d.value) || 0;
+          if (!isNaN(amount) && summary[d.branch]) {
+            summary[d.branch].total += amount;
+            summary[d.branch][d.payment] += amount;
+          }
+        }
+      });
+
+      summaryList.innerHTML = '';
+      for (const [branch, data] of Object.entries(summary)) {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${branch}</strong><br>
+          الإجمالي: ${data.total.toFixed(2)} جنيه<br>
+          - كاش: ${data['كاش'].toFixed(2)}<br>
+          - تحويل: ${data['تحويل'].toFixed(2)}<br>
+          - شيك: ${data['شيك'].toFixed(2)}<br>
+          - مصروف: ${data['مصروف'].toFixed(2)}`;
+        summaryList.appendChild(li);
+      }
+    }
+
+    function updateTopStats() {
+      const donorTotals = {};
+      const branchTotals = {};
+
+      donations.forEach(d => {
+        if (d.type === 'مالي') {
+          const amount = parseFloat(d.value) || 0;
+          if (!isNaN(amount)) {
+            donorTotals[d.donor] = (donorTotals[d.donor] || 0) + amount;
+            branchTotals[d.branch] = (branchTotals[d.branch] || 0) + amount;
+          }
+        }
+      });
+
+      const topDonor = Object.entries(donorTotals).sort((a, b) => b[1] - a[1])[0];
+      const topBranch = Object.entries(branchTotals).sort((a, b) => b[1] - a[1])[0];
+
+      topDonorEl.textContent = topDonor ? `أعلى متبرع: ${topDonor[0]} - ${topDonor[1].toFixed(2)} جنيه` : 'أعلى متبرع: لا يوجد بيانات بعد';
+      topBranchEl.textContent = topBranch ? `أعلى فرع: ${topBranch[0]} - ${topBranch[1].toFixed(2)} جنيه` : 'أعلى فرع: لا يوجد بيانات بعد';
+    }
+  </script>
+</body>
+</html>
