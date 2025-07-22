@@ -33,7 +33,7 @@
 </head>
 <body>
 
-  <header>
+  <header id="header" style="display: none;">
     <h1>نظام التبرعات الخيرية</h1>
     <nav>
       <button onclick="showSection('donationFormSection')">إضافة متبرع</button>
@@ -118,6 +118,7 @@
           <th>التاريخ</th>
           <th>رقم الإيصال</th>
           <th>رقم الدفتر</th>
+          <th>حذف</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -191,6 +192,7 @@
 
       if (username === 'رجب طه' && password === '4356') {
         document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('header').style.display = 'block';
         document.getElementById('donationFormSection').style.display = 'block';
         loadDonations();
       } else {
@@ -232,9 +234,20 @@
       tableBody.innerHTML = '';
       donations.forEach(d => {
         const row = document.createElement('tr');
-        row.innerHTML = `<td>${d.donor}</td><td>${d.phone}</td><td>${d.type}</td><td>${d.value}</td><td>${d.payment}</td><td>${d.branch}</td><td>${d.date}</td><td>${d.receipt}</td><td>${d.book}</td>`;
+        row.innerHTML = `<td>${d.donor}</td><td>${d.phone}</td><td>${d.type}</td><td>${d.value}</td><td>${d.payment}</td><td>${d.branch}</td><td>${d.date}</td><td>${d.receipt}</td><td>${d.book}</td>
+        <td><button onclick="deleteDonation('${d.id}')">حذف</button></td>`;
         tableBody.appendChild(row);
       });
+    }
+
+    async function deleteDonation(id) {
+      const { error } = await client.from('donations').delete().eq('id', id);
+      if (error) {
+        alert('خطأ أثناء الحذف: ' + error.message);
+        return;
+      }
+      donations = donations.filter(d => d.id !== id);
+      updateTable();
     }
 
     function updateDonorDetails() {
@@ -323,19 +336,6 @@
 
       topDonor.innerText = topD ? `أعلى متبرع: ${topD[0]} (${topD[1].toFixed(2)} جنيه)` : '';
       topBranch.innerText = topB ? `أكبر فرع: ${topB[0]} (${topB[1].toFixed(2)} جنيه)` : '';
-    }
-
-    function showSection(sectionId) {
-      // إخفاء جميع الأقسام
-      document.getElementById('donationFormSection').style.display = 'none';
-      document.getElementById('reportSection').style.display = 'none';
-      document.getElementById('branchSummarySection').style.display = 'none';
-      document.getElementById('topSection').style.display = 'none';
-      document.getElementById('donorDetailsSection').style.display = 'none';
-      document.getElementById('summarySection').style.display = 'none';
-
-      // إظهار القسم المطلوب
-      document.getElementById(sectionId).style.display = 'block';
     }
 
     loadDonations();
