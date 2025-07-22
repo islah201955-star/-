@@ -338,6 +338,21 @@
     }
 
     loadDonations();
+
+      function showSection(id) {
+    const sections = [
+      'donationFormSection',
+      'reportSection',
+      'summarySection',
+      'topSection',
+      'branchSummarySection',
+      'donorDetailsSection'
+    ];
+    sections.forEach(sec => {
+      document.getElementById(sec).style.display = 'none';
+    });
+    document.getElementById(id).style.display = 'block';
+  }
   </script>
 
 </body>
