@@ -262,7 +262,27 @@
   });
 }
 
+  async function deleteSpecificDonor() {
+  const name = document.getElementById('deleteDonorName').value;
+  if (!confirm(`هل أنت متأكد من حذف جميع التبرعات باسم "${name}"؟`)) return;
+
+  const { error } = await client.from('donations').delete().eq('donor', name);
+  if (error) {
+    alert('حدث خطأ أثناء الحذف: ' + error.message);
+    return;
+  }
+
+  donations = donations.filter(d => d.donor !== name);
+  updateTable();
+  updateChart();
+  updateBranchSummary();
+  updateTopStats();
+  updateDonorDropdown();
+
+  alert(`تم حذف جميع التبرعات باسم "${name}"`);
+}
   
+
   </script>
 
 </body>
