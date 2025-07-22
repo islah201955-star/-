@@ -33,6 +33,8 @@
 
   <h1>نظام التبرعات الخيرية</h1>
 
+<button onclick="deleteAllDonations()" style="background:#e74c3c; margin-bottom: 20px;">🗑 حذف كل التبرعات</button>
+
   <div class="form-section">
     <h2>إدخال تبرع</h2>
     <form id="donationForm">
@@ -222,6 +224,24 @@
     }
 
     loadDonations();
+
+    async function deleteAllDonations() {
+  if (!confirm("هل أنت متأكد أنك تريد حذف جميع التبرعات؟ هذا الإجراء لا يمكن التراجع عنه.")) return;
+
+  const { error } = await client.from('donations').delete().neq('id', 0); // احذف الكل
+  if (error) {
+    alert('خطأ أثناء الحذف: ' + error.message);
+    return;
+  }
+
+  donations = [];
+  updateTable();
+  updateChart();
+  updateBranchSummary();
+  updateTopStats();
+  alert("تم حذف جميع التبرعات بنجاح.");
+}
+
   </script>
 
 </body>
