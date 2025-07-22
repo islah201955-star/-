@@ -249,6 +249,20 @@
   alert("تم حذف جميع التبرعات بنجاح.");
 }
 
+  function updateDonorDropdown() {
+  const select = document.getElementById('deleteDonorName');
+  const uniqueDonors = [...new Set(donations.map(d => d.donor))];
+
+  select.innerHTML = '';
+  uniqueDonors.forEach(name => {
+    const option = document.createElement('option');
+    option.value = name;
+    option.textContent = name;
+    select.appendChild(option);
+  });
+}
+
+  
   </script>
 
 </body>
