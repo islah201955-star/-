@@ -233,7 +233,17 @@
       tableBody.innerHTML = '';
       donations.forEach(d => {
         const row = document.createElement('tr');
-        row.innerHTML = `<td>${d.donor}</td><td>${d.phone}</td><td>${d.type}</td><td>${d.value}</td><td>${d.payment}</td><td>${d.branch}</td><td>${d.date}</td><td>${d.receipt}</td><td>${d.book}</td>
+row.innerHTML = `
+  <td>${d.donor}</td>
+  <td>${d.phone}</td>
+  <td>${d.type}</td>
+  <td>${d.value}</td>
+  <td>${d.payment}</td>
+  <td>${d.branch}</td>
+  <td>${d.date}</td>
+  <td>${d.receipt_number}</td>
+  <td>${d.book_number}</td>
+  <td><button onclick="deleteDonation('${d.id}')">حذف</button></td>`;
         <td><button onclick="deleteDonation('${d.id}')">حذف</button></td>`;
         tableBody.appendChild(row);
       });
