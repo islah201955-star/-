@@ -38,23 +38,26 @@
     <nav>
       <button onclick="showAddDonation()">إضافة متبرع</button>
       <button onclick="showAllDonors()">عرض جميع المتبرعين</button>
+      <button onclick="showBranchSummary()">إجمالي التبرعات لكل فرع</button>
+      <button onclick="showTopStats()">أعلى المتبرعين والفروع</button>
     </nav>
   </header>
 
-  <div class="login-section">
+  <div class="login-section" id="loginSection">
     <h2>تسجيل الدخول</h2>
     <form id="loginForm">
       <label>اسم المستخدم:</label>
-      <input type="text" id="username" value="رجب طه" required>
+      <input type="text" id="username" required>
 
       <label>كلمة المرور:</label>
-      <input type="password" id="password" value="4356" required>
+      <input type="password" id="password" required>
 
       <button type="submit">تسجيل الدخول</button>
+      <p id="loginError" style="color: red; display: none;">اسم المستخدم أو كلمة المرور غير صحيحة</p>
     </form>
   </div>
 
-  <div class="form-section">
+  <div class="form-section" id="donationFormSection" style="display: none;">
     <h2>إدخال تبرع</h2>
     <form id="donationForm">
       <label>اسم المتبرع:</label>
@@ -101,7 +104,7 @@
     </form>
   </div>
 
-  <div class="report-section">
+  <div class="report-section" id="reportSection" style="display: none;">
     <h2>سجل التبرعات</h2>
     <table id="donationTable">
       <thead>
@@ -122,7 +125,7 @@
     <canvas id="donationChart" width="400" height="200"></canvas>
   </div>
 
-  <div class="donor-details-section">
+  <div class="donor-details-section" id="donorDetailsSection" style="display: none;">
     <h2>تفاصيل المتبرعين</h2>
     <table id="donorDetailsTable">
       <thead>
@@ -136,17 +139,17 @@
     </table>
   </div>
 
-  <div class="branch-summary-section">
+  <div class="branch-summary-section" id="branchSummarySection" style="display: none;">
     <h2>إجمالي التبرعات لكل فرع</h2>
     <ul id="branchTotalSummary"></ul>
   </div>
 
-  <div class="summary-section">
+  <div class="summary-section" id="summarySection" style="display: none;">
     <h2>تفصيل التبرعات حسب الفروع</h2>
     <ul id="branchSummary"></ul>
   </div>
 
-  <div class="top-section">
+  <div class="top-section" id="topSection" style="display: none;">
     <h2>أعلى المتبرعين والفروع</h2>
     <p id="topDonor"></p>
     <p id="topBranch"></p>
@@ -180,6 +183,20 @@
       updateDonorDetails();
       updateBranchTotalSummary();
     }
+
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      if (username === 'رجب طه' && password === '4356') {
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('donationFormSection').style.display = 'block';
+        loadDonations();
+      } else {
+        document.getElementById('loginError').style.display = 'block';
+      }
+    });
 
     form.addEventListener('submit', async function(e) {
       e.preventDefault();
