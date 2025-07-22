@@ -7,123 +7,192 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body { font-family: Tahoma, sans-serif; background: #f4f4f4; padding: 20px; direction: rtl; }
+    body {
+      font-family: Tahoma, sans-serif;
+      background: #f4f4f4;
+      padding: 20px;
+      direction: rtl;
+      display: flex;
+    }
+
+    /* القائمة الجانبية */
+    .sidebar {
+      width: 200px;
+      background: #2c3e50;
+      padding: 20px;
+      color: white;
+      height: 100vh;
+      position: fixed;
+      right: 0;
+      top: 0;
+    }
+
+    .sidebar h2 {
+      font-size: 18px;
+      margin-bottom: 20px;
+      color: #ecf0f1;
+    }
+
+    .sidebar a {
+      display: block;
+      color: #ecf0f1;
+      text-decoration: none;
+      margin-bottom: 10px;
+      padding: 8px;
+      border-radius: 5px;
+      transition: background 0.2s;
+    }
+
+    .sidebar a:hover {
+      background: #34495e;
+    }
+
+    /* محتوى الصفحة */
+    .content {
+      flex: 1;
+      margin-right: 220px; /* هامش بسبب القائمة الجانبية */
+    }
+
     h1, h2 { color: #333; }
     .form-section, .report-section, .summary-section, .top-section {
-      background: #fff; padding: 20px; margin-bottom: 20px;
-      border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      background: #fff;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
+
     label { display: block; margin-top: 10px; }
-    input, select, textarea {
-      width: 100%; padding: 8px; margin-top: 5px;
-      border-radius: 5px; border: 1px solid #ccc;
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
     }
+
     button {
-      padding: 10px 20px; background: #3498db; color: #fff;
-      border: none; border-radius: 5px; margin-top: 15px;
+      padding: 10px 20px;
+      background: #3498db;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      margin-top: 15px;
       cursor: pointer;
     }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 10px;
+      text-align: center;
+    }
+
     ul { list-style: none; padding: 0; }
     canvas { margin-top: 30px; }
   </style>
 </head>
 <body>
 
-<h1 style="margin-right: 220px;">نظام التبرعات الخيرية</h1>
-
-<div id="formSection" class="form-section" style="margin-right: 220px;">
-<div style="margin: 20px 0;">
-  <label>اختر اسم المتبرع لحذفه:</label>
-  <select id="deleteDonorName"></select>
-  <button onclick="deleteSpecificDonor()" style="background:#c0392b; color:white; margin-top:10px;">
-    🗑 حذف هذا المتبرع
-  </button>
-</div>
-
-
-  <div class="form-section">
-    <h2>إدخال تبرع</h2>
-    <form id="donationForm">
-      <label>اسم المتبرع:</label>
-      <input type="text" id="donorName" required>
-
-      <label>نوع التبرع:</label>
-      <select id="donationType">
-        <option value="مالي">مالي</option>
-        <option value="عيني">عيني</option>
-      </select>
-
-      <label>قيمة / وصف التبرع:</label>
-      <input type="text" id="donationValue" required>
-
-      <label>طريقة الدفع:</label>
-      <select id="paymentMethod">
-        <option value="كاش">كاش</option>
-        <option value="تحويل">تحويل</option>
-        <option value="شيك">شيك</option>
-        <option value="مصروف">مصروف</option>
-      </select>
-
-      <label>الفرع:</label>
-      <select id="branch">
-        <option value="حي مكة">حي مكة</option>
-        <option value="أبراج الجامعة">أبراج الجامعة</option>
-        <option value="المنيا الجديدة">المنيا الجديدة</option>
-        <option value="فرع سمالوط">فرع سمالوط</option>
-      </select>
-
-      <label>تاريخ التبرع:</label>
-      <input type="date" id="date" required>
-
-      <button type="submit">حفظ التبرع</button>
-    </form>
+  <!-- القائمة الجانبية -->
+  <div class="sidebar">
+    <h2>القائمة</h2>
+    <a href="#donorFormSection">➕ إضافة متبرع جديد</a>
+    <a href="#donationListSection">📋 سجل التبرعات</a>
+    <a href="#summarySection">📊 تقرير الفروع</a>
+    <a href="#topSection">⭐ الأعلى</a>
   </div>
 
-  <div class="report-section">
-    <h2>سجل التبرعات</h2>
-    <table id="donationTable">
-      <thead>
-        <tr>
-          <th>المتبرع</th>
-          <th>النوع</th>
-          <th>القيمة</th>
-          <th>طريقة الدفع</th>
-          <th>الفرع</th>
-          <th>التاريخ</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-    <canvas id="donationChart" width="400" height="200"></canvas>
+  <!-- المحتوى الرئيسي -->
+  <div class="content">
+
+    <h1>نظام التبرعات الخيرية</h1>
+
+    <div style="margin: 20px 0;">
+      <label>اختر اسم المتبرع لحذفه:</label>
+      <select id="deleteDonorName"></select>
+      <button onclick="deleteSpecificDonor()" style="background:#c0392b; color:white; margin-top:10px;">
+        🗑 حذف هذا المتبرع
+      </button>
+    </div>
+
+    <div id="donorFormSection" class="form-section">
+      <h2>إدخال تبرع</h2>
+      <form id="donationForm">
+        <label>اسم المتبرع:</label>
+        <input type="text" id="donorName" required>
+
+        <label>نوع التبرع:</label>
+        <select id="donationType">
+          <option value="مالي">مالي</option>
+          <option value="عيني">عيني</option>
+        </select>
+
+        <label>قيمة / وصف التبرع:</label>
+        <input type="text" id="donationValue" required>
+
+        <label>طريقة الدفع:</label>
+        <select id="paymentMethod">
+          <option value="كاش">كاش</option>
+          <option value="تحويل">تحويل</option>
+          <option value="شيك">شيك</option>
+          <option value="مصروف">مصروف</option>
+        </select>
+
+        <label>الفرع:</label>
+        <select id="branch">
+          <option value="حي مكة">حي مكة</option>
+          <option value="أبراج الجامعة">أبراج الجامعة</option>
+          <option value="المنيا الجديدة">المنيا الجديدة</option>
+          <option value="فرع سمالوط">فرع سمالوط</option>
+        </select>
+
+        <label>تاريخ التبرع:</label>
+        <input type="date" id="date" required>
+
+        <button type="submit">حفظ التبرع</button>
+      </form>
+    </div>
+
+    <div id="donationListSection" class="report-section">
+      <h2>سجل التبرعات</h2>
+      <table id="donationTable">
+        <thead>
+          <tr>
+            <th>المتبرع</th>
+            <th>النوع</th>
+            <th>القيمة</th>
+            <th>طريقة الدفع</th>
+            <th>الفرع</th>
+            <th>التاريخ</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <canvas id="donationChart" width="400" height="200"></canvas>
+    </div>
+
+    <div id="summarySection" class="summary-section">
+      <h2>تفصيل التبرعات حسب الفروع</h2>
+      <ul id="branchSummary"></ul>
+    </div>
+
+    <div id="topSection" class="top-section">
+      <h2>أعلى المتبرعين والفروع</h2>
+      <p id="topDonor"></p>
+      <p id="topBranch"></p>
+    </div>
+
   </div>
-
-  <div class="summary-section">
-    <h2>تفصيل التبرعات حسب الفروع</h2>
-    <ul id="branchSummary"></ul>
-  </div>
-
-  <div class="top-section">
-    <h2>أعلى المتبرعين والفروع</h2>
-    <p id="topDonor"></p>
-    <p id="topBranch"></p>
-  </div>
-
-  <div style="position: fixed; top: 0; left: 0; height: 100%; width: 200px; background: #2c3e50; color: white; padding-top: 60px; z-index: 100;">
-  <h3 style="text-align: center; margin-bottom: 30px;">📋 القائمة</h3>
-  <ul style="list-style: none; padding: 0; text-align: center;">
-    <li style="margin-bottom: 20px;"><a href="#formSection" style="color: white; text-decoration: none;">➕ إضافة متبرع</a></li>
-    <li style="margin-bottom: 20px;"><a href="#reportSection" style="color: white; text-decoration: none;">📄 سجل التبرعات</a></li>
-    <li style="margin-bottom: 20px;"><a href="#summarySection" style="color: white; text-decoration: none;">📊 ملخص الفروع</a></li>
-    <li style="margin-bottom: 20px;"><a href="#topSection" style="color: white; text-decoration: none;">🏆 الأعلى تبرعًا</a></li>
-  </ul>
-</div>
-
 
   <script>
     const supabaseUrl = 'https://evkjkupolspmyaygtppb.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2a2prdXBvbHNwbXlheWd0cHBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMxMTUxMDAsImV4cCI6MjA2ODY5MTEwMH0.Mf2ZzhG84cYufTN2Z8AaK1ylxxzAMUPiWTG7aP_clI4';
+    const supabaseKey = 'eyJhbGciOi...'; // ضع المفتاح الكامل
     const client = supabase.createClient(supabaseUrl, supabaseKey);
 
     const form = document.getElementById('donationForm');
@@ -135,42 +204,35 @@
 
     async function loadDonations() {
       const { data, error } = await client.from('donations').select('*');
-      if (error) {
-        alert('خطأ في تحميل التبرعات: ' + error.message);
-        return;
-      }
+      if (error) return alert('خطأ في تحميل التبرعات: ' + error.message);
       donations = data;
+      updateAll();
+    }
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const donation = {
+        donor: donorName.value,
+        type: donationType.value,
+        value: donationValue.value,
+        payment: paymentMethod.value,
+        branch: branch.value,
+        date: date.value,
+      };
+      const { error } = await client.from('donations').insert([donation]);
+      if (error) return alert('خطأ أثناء الحفظ: ' + error.message);
+      donations.push(donation);
+      updateAll();
+      form.reset();
+    });
+
+    function updateAll() {
       updateTable();
       updateChart();
       updateBranchSummary();
       updateTopStats();
       updateDonorDropdown();
     }
-
-    form.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const donation = {
-        donor: document.getElementById('donorName').value,
-        type: document.getElementById('donationType').value,
-        value: document.getElementById('donationValue').value,
-        payment: document.getElementById('paymentMethod').value,
-        branch: document.getElementById('branch').value,
-        date: document.getElementById('date').value,
-      };
-
-      const { error } = await client.from('donations').insert([donation]);
-      if (error) {
-        alert('خطأ أثناء الحفظ: ' + error.message);
-        return;
-      }
-
-      donations.push(donation);
-      updateTable();
-      updateChart();
-      updateBranchSummary();
-      updateTopStats();
-      form.reset();
-    });
 
     function updateTable() {
       tableBody.innerHTML = '';
@@ -184,15 +246,13 @@
     function updateChart() {
       const ctx = document.getElementById('donationChart').getContext('2d');
       const typeCounts = { مالي: 0, عيني: 0 };
-      donations.forEach(d => { typeCounts[d.type]++; });
-
+      donations.forEach(d => typeCounts[d.type]++);
       if (window.chart) window.chart.destroy();
       window.chart = new Chart(ctx, {
         type: 'pie',
         data: {
           labels: ['مالي', 'عيني'],
           datasets: [{
-            label: 'أنواع التبرعات',
             data: [typeCounts.مالي, typeCounts.عيني],
             backgroundColor: ['#2ecc71', '#e67e22']
           }]
@@ -204,15 +264,12 @@
       const summary = {};
       donations.forEach(d => {
         const amount = parseFloat(d.value) || 0;
-        if (!summary[d.branch]) {
-          summary[d.branch] = { total: 0, كاش: 0, تحويل: 0, شيك: 0, مصروف: 0 };
-        }
+        if (!summary[d.branch]) summary[d.branch] = { total: 0, كاش: 0, تحويل: 0, شيك: 0, مصروف: 0 };
         if (d.type === 'مالي') {
           summary[d.branch].total += amount;
           summary[d.branch][d.payment] += amount;
         }
       });
-
       summaryList.innerHTML = '';
       for (const [branch, data] of Object.entries(summary)) {
         const li = document.createElement('li');
@@ -225,9 +282,7 @@
     }
 
     function updateTopStats() {
-      const donorTotals = {};
-      const branchTotals = {};
-
+      const donorTotals = {}, branchTotals = {};
       donations.forEach(d => {
         const amount = parseFloat(d.value) || 0;
         if (d.type === 'مالي') {
@@ -235,67 +290,35 @@
           branchTotals[d.branch] = (branchTotals[d.branch] || 0) + amount;
         }
       });
-
       const topD = Object.entries(donorTotals).sort((a, b) => b[1] - a[1])[0];
       const topB = Object.entries(branchTotals).sort((a, b) => b[1] - a[1])[0];
-
       topDonor.innerText = topD ? `أعلى متبرع: ${topD[0]} (${topD[1].toFixed(2)} جنيه)` : '';
       topBranch.innerText = topB ? `أكبر فرع: ${topB[0]} (${topB[1].toFixed(2)} جنيه)` : '';
     }
 
+    function updateDonorDropdown() {
+      const select = document.getElementById('deleteDonorName');
+      const uniqueDonors = [...new Set(donations.map(d => d.donor))];
+      select.innerHTML = '';
+      uniqueDonors.forEach(name => {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        select.appendChild(option);
+      });
+    }
+
+    async function deleteSpecificDonor() {
+      const name = document.getElementById('deleteDonorName').value;
+      if (!confirm(`هل أنت متأكد من حذف جميع التبرعات باسم "${name}"؟`)) return;
+      const { error } = await client.from('donations').delete().eq('donor', name);
+      if (error) return alert('حدث خطأ أثناء الحذف: ' + error.message);
+      donations = donations.filter(d => d.donor !== name);
+      updateAll();
+      alert(`تم حذف جميع التبرعات باسم "${name}"`);
+    }
+
     loadDonations();
-
-    async function deleteAllDonations() {
-  if (!confirm("هل أنت متأكد أنك تريد حذف جميع التبرعات؟ هذا الإجراء لا يمكن التراجع عنه.")) return;
-
-  const { error } = await client.from('donations').delete().neq('id', 0); // احذف الكل
-  if (error) {
-    alert('خطأ أثناء الحذف: ' + error.message);
-    return;
-  }
-
-  donations = [];
-  updateTable();
-  updateChart();
-  updateBranchSummary();
-  updateTopStats();
-  alert("تم حذف جميع التبرعات بنجاح.");
-}
-
-  function updateDonorDropdown() {
-  const select = document.getElementById('deleteDonorName');
-  const uniqueDonors = [...new Set(donations.map(d => d.donor))];
-
-  select.innerHTML = '';
-  uniqueDonors.forEach(name => {
-    const option = document.createElement('option');
-    option.value = name;
-    option.textContent = name;
-    select.appendChild(option);
-  });
-}
-
-  async function deleteSpecificDonor() {
-  const name = document.getElementById('deleteDonorName').value;
-  if (!confirm(`هل أنت متأكد من حذف جميع التبرعات باسم "${name}"؟`)) return;
-
-  const { error } = await client.from('donations').delete().eq('donor', name);
-  if (error) {
-    alert('حدث خطأ أثناء الحذف: ' + error.message);
-    return;
-  }
-
-  donations = donations.filter(d => d.donor !== name);
-  updateTable();
-  updateChart();
-  updateBranchSummary();
-  updateTopStats();
-  updateDonorDropdown();
-
-  alert(`تم حذف جميع التبرعات باسم "${name}"`);
-}
-  
-
   </script>
 
 </body>
