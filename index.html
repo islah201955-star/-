@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>برنامج التبرعات - Supabase</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body { font-family: Tahoma, sans-serif; background: #f4f4f4; padding: 20px; direction: rtl; }
@@ -157,10 +157,9 @@
   </div>
 
   <script>
-    const supabase = window.supabase.createClient(
-      'https://evkjkupolspmyaygtppb.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2a2prdXBvbHNwbXlheWd0cHBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMxMTUxMDAsImV4cCI6MjA2ODY5MTEwMH0.Mf2ZzhG84cYufTN2Z8AaK1ylxxzAMUPiWTG7aP_clI4'
-    );
+    const supabaseUrl = 'https://evkjkupolspmyaygtppb.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2a2prdXBvbHNwbXlheWd0cHBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMxMTUxMDAsImV4cCI6MjA2ODY5MTEwMH0.Mf2ZzhG84cYufTN2Z8AaK1ylxxzAMUPiWTG7aP_clI4'; // استبدل هذا بمفتاح API الصحيح
+    const client = supabase.createClient(supabaseUrl, supabaseKey);
 
     const form = document.getElementById('donationForm');
     const tableBody = document.querySelector('#donationTable tbody');
@@ -172,7 +171,7 @@
     let donations = [];
 
     async function loadDonations() {
-    const { data, error } = await supabaseClient.from('donations').select('*');
+      const { data, error } = await client.from('donations').select('*');
       if (error) {
         alert('خطأ في تحميل التبرعات: ' + error.message);
         return;
@@ -338,22 +337,20 @@
       topBranch.innerText = topB ? `أكبر فرع: ${topB[0]} (${topB[1].toFixed(2)} جنيه)` : '';
     }
 
-    loadDonations();
+    function showSection(sectionId) {
+      // إخفاء جميع الأقسام
+      document.getElementById('donationFormSection').style.display = 'none';
+      document.getElementById('reportSection').style.display = 'none';
+      document.getElementById('branchSummarySection').style.display = 'none';
+      document.getElementById('topSection').style.display = 'none';
+      document.getElementById('donorDetailsSection').style.display = 'none';
+      document.getElementById('summarySection').style.display = 'none';
 
-      function showSection(id) {
-    const sections = [
-      'donationFormSection',
-      'reportSection',
-      'summarySection',
-      'topSection',
-      'branchSummarySection',
-      'donorDetailsSection'
-    ];
-    sections.forEach(sec => {
-      document.getElementById(sec).style.display = 'none';
-    });
-    document.getElementById(id).style.display = 'block';
-  }
+      // إظهار القسم المطلوب
+      document.getElementById(sectionId).style.display = 'block';
+    }
+
+    loadDonations();
   </script>
 
 </body>
