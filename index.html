@@ -208,8 +208,8 @@
         payment: document.getElementById('paymentMethod').value,
         branch: document.getElementById('branch').value,
         date: document.getElementById('date').value,
-        receipt: document.getElementById('receiptNumber').value,
-        book: document.getElementById('bookNumber').value,
+        receipt_number: document.getElementById('receipt_number').value,
+        book_number: document.getElementById('book_number').value,
       };
 
       const { error } = await client.from('donations').insert([donation]);
