@@ -36,10 +36,10 @@
   <header>
     <h1>نظام التبرعات الخيرية</h1>
     <nav>
-      <button onclick="showAddDonation()">إضافة متبرع</button>
-      <button onclick="showAllDonors()">عرض جميع المتبرعين</button>
-      <button onclick="showBranchSummary()">إجمالي التبرعات لكل فرع</button>
-      <button onclick="showTopStats()">أعلى المتبرعين والفروع</button>
+      <button onclick="showSection('donationFormSection')">إضافة متبرع</button>
+      <button onclick="showSection('reportSection')">عرض جميع المتبرعين</button>
+      <button onclick="showSection('branchSummarySection')">إجمالي التبرعات لكل فرع</button>
+      <button onclick="showSection('topSection')">أعلى المتبرعين والفروع</button>
     </nav>
   </header>
 
@@ -323,6 +323,19 @@
 
       topDonor.innerText = topD ? `أعلى متبرع: ${topD[0]} (${topD[1].toFixed(2)} جنيه)` : '';
       topBranch.innerText = topB ? `أكبر فرع: ${topB[0]} (${topB[1].toFixed(2)} جنيه)` : '';
+    }
+
+    function showSection(sectionId) {
+      // إخفاء جميع الأقسام
+      document.getElementById('donationFormSection').style.display = 'none';
+      document.getElementById('reportSection').style.display = 'none';
+      document.getElementById('branchSummarySection').style.display = 'none';
+      document.getElementById('topSection').style.display = 'none';
+      document.getElementById('donorDetailsSection').style.display = 'none';
+      document.getElementById('summarySection').style.display = 'none';
+
+      // إظهار القسم المطلوب
+      document.getElementById(sectionId).style.display = 'block';
     }
 
     loadDonations();
