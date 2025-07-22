@@ -33,7 +33,14 @@
 
   <h1>نظام التبرعات الخيرية</h1>
 
-<button onclick="deleteAllDonations()" style="background:#e74c3c; margin-bottom: 20px;">🗑 حذف كل التبرعات</button>
+<div style="margin: 20px 0;">
+  <label>اختر اسم المتبرع لحذفه:</label>
+  <select id="deleteDonorName"></select>
+  <button onclick="deleteSpecificDonor()" style="background:#c0392b; color:white; margin-top:10px;">
+    🗑 حذف هذا المتبرع
+  </button>
+</div>
+
 
   <div class="form-section">
     <h2>إدخال تبرع</h2>
