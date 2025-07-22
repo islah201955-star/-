@@ -3,80 +3,65 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>نظام التبرعات الخيرية</title>
+  <title>برنامج التبرعات - Supabase</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    body {
-      font-family: Tahoma, sans-serif;
-      background: white;
-      margin: 0;
-      display: flex;
+    body { font-family: Tahoma, sans-serif; background: #f4f4f4; padding: 20px; direction: rtl; }
+    h1, h2 { color: #333; }
+    .form-section, .report-section, .summary-section, .top-section, .login-section, .donor-details-section, .branch-summary-section {
+      background: #fff; padding: 20px; margin-bottom: 20px;
+      border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    .sidebar {
-      width: 250px;
-      background: #2c3e50;
-      color: white;
-      height: 100vh;
-      padding: 20px;
+    label { display: block; margin-top: 10px; }
+    input, select, textarea {
+      width: 100%; padding: 8px; margin-top: 5px;
+      border-radius: 5px; border: 1px solid #ccc;
     }
-    .sidebar h2 {
-      margin-bottom: 30px;
-      text-align: center;
-    }
-    .sidebar button {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      background: #3498db;
-      border: none;
-      color: white;
-      border-radius: 5px;
+    button {
+      padding: 10px 20px; background: #3498db; color: #fff;
+      border: none; border-radius: 5px; margin-top: 15px;
       cursor: pointer;
     }
-    .content {
-      flex: 1;
-      padding: 30px;
-      display: none;
-    }
-    .content.active {
-      display: block;
-    }
-    input, select, button, textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-    }
-    h1, h2 {
-      color: #2c3e50;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 10px;
-      text-align: center;
-    }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+    ul { list-style: none; padding: 0; }
+    canvas { margin-top: 30px; }
+    header { margin-bottom: 20px; }
+    nav button { margin-right: 10px; }
   </style>
 </head>
 <body>
-  <div class="sidebar">
-    <h2>القائمة الرئيسية</h2>
-    <button onclick="showSection('addDonor')">➕ إضافة متبرع</button>
-    <button onclick="showSection('donorList')">📋 قائمة المتبرعين</button>
-    <button onclick="showSection('donationSummary')">📊 ملخص التبرعات</button>
+
+  <header>
+    <h1>نظام التبرعات الخيرية</h1>
+    <nav>
+      <button onclick="showAddDonation()">إضافة متبرع</button>
+      <button onclick="showAllDonors()">عرض جميع المتبرعين</button>
+    </nav>
+  </header>
+
+  <div class="login-section">
+    <h2>تسجيل الدخول</h2>
+    <form id="loginForm">
+      <label>اسم المستخدم:</label>
+      <input type="text" id="username" value="رجب طه" required>
+
+      <label>كلمة المرور:</label>
+      <input type="password" id="password" value="4356" required>
+
+      <button type="submit">تسجيل الدخول</button>
+    </form>
   </div>
 
-  <div class="content" id="addDonor">
-    <h2>إضافة متبرع جديد</h2>
+  <div class="form-section">
+    <h2>إدخال تبرع</h2>
     <form id="donationForm">
       <label>اسم المتبرع:</label>
-      <input type="text" id="donorName" required />
+      <input type="text" id="donorName" required>
+
+      <label>رقم الهاتف:</label>
+      <input type="text" id="phoneNumber" required>
 
       <label>نوع التبرع:</label>
       <select id="donationType">
@@ -84,8 +69,8 @@
         <option value="عيني">عيني</option>
       </select>
 
-      <label>القيمة / الوصف:</label>
-      <input type="text" id="donationValue" required />
+      <label>قيمة / وصف التبرع:</label>
+      <input type="text" id="donationValue" required>
 
       <label>طريقة الدفع:</label>
       <select id="paymentMethod">
@@ -104,77 +89,125 @@
       </select>
 
       <label>تاريخ التبرع:</label>
-      <input type="date" id="date" required />
+      <input type="date" id="date" required>
 
-      <button type="submit">💾 حفظ</button>
+      <label>رقم الإيصال:</label>
+      <input type="text" id="receiptNumber" required>
+
+      <label>رقم الدفتر:</label>
+      <input type="text" id="bookNumber" required>
+
+      <button type="submit">حفظ التبرع</button>
     </form>
   </div>
 
-  <div class="content" id="donorList">
-    <h2>سجل المتبرعين</h2>
+  <div class="report-section">
+    <h2>سجل التبرعات</h2>
     <table id="donationTable">
       <thead>
         <tr>
           <th>المتبرع</th>
+          <th>رقم الهاتف</th>
           <th>النوع</th>
           <th>القيمة</th>
           <th>طريقة الدفع</th>
           <th>الفرع</th>
           <th>التاريخ</th>
+          <th>رقم الإيصال</th>
+          <th>رقم الدفتر</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+    <canvas id="donationChart" width="400" height="200"></canvas>
+  </div>
+
+  <div class="donor-details-section">
+    <h2>تفاصيل المتبرعين</h2>
+    <table id="donorDetailsTable">
+      <thead>
+        <tr>
+          <th>اسم المتبرع</th>
+          <th>رقم الهاتف</th>
+          <th>المبلغ المتبرع به</th>
         </tr>
       </thead>
       <tbody></tbody>
     </table>
   </div>
 
-  <div class="content" id="donationSummary">
-    <h2>ملخص التبرعات</h2>
+  <div class="branch-summary-section">
+    <h2>إجمالي التبرعات لكل فرع</h2>
+    <ul id="branchTotalSummary"></ul>
+  </div>
+
+  <div class="summary-section">
+    <h2>تفصيل التبرعات حسب الفروع</h2>
     <ul id="branchSummary"></ul>
+  </div>
+
+  <div class="top-section">
+    <h2>أعلى المتبرعين والفروع</h2>
     <p id="topDonor"></p>
     <p id="topBranch"></p>
-    <canvas id="donationChart" width="400" height="200"></canvas>
   </div>
 
   <script>
-    const supabase = supabase.createClient(
-      'https://evkjkupolspmyaygtppb.supabase.co',
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2a2prdXBvbHNwbXlheWd0cHBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMxMTUxMDAsImV4cCI6MjA2ODY5MTEwMH0.Mf2ZzhG84cYufTN2Z8AaK1ylxxzAMUPiWTG7aP_clI4'
-    );
+    const supabaseUrl = 'https://evkjkupolspmyaygtppb.supabase.co';
+    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2a2prdXBvbHNwbXlheWd0cHBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMxMTUxMDAsImV4cCI6MjA2ODY5MTEwMH0.Mf2ZzhG84cYufTN2Z8AaK1ylxxzAMUPiWTG7aP_clI4';
+    const client = supabase.createClient(supabaseUrl, supabaseKey);
 
     const form = document.getElementById('donationForm');
     const tableBody = document.querySelector('#donationTable tbody');
+    const donorDetailsBody = document.querySelector('#donorDetailsTable tbody');
     const summaryList = document.getElementById('branchSummary');
+    const branchTotalSummary = document.getElementById('branchTotalSummary');
     const topDonor = document.getElementById('topDonor');
     const topBranch = document.getElementById('topBranch');
     let donations = [];
 
     async function loadDonations() {
-      const { data, error } = await supabase.from('donations').select('*');
-      if (error) return alert('خطأ في التحميل: ' + error.message);
+      const { data, error } = await client.from('donations').select('*');
+      if (error) {
+        alert('خطأ في تحميل التبرعات: ' + error.message);
+        return;
+      }
       donations = data;
       updateTable();
       updateChart();
       updateBranchSummary();
       updateTopStats();
+      updateDonorDetails();
+      updateBranchTotalSummary();
     }
 
-    form.addEventListener('submit', async e => {
+    form.addEventListener('submit', async function(e) {
       e.preventDefault();
       const donation = {
         donor: document.getElementById('donorName').value,
+        phone: document.getElementById('phoneNumber').value,
         type: document.getElementById('donationType').value,
         value: document.getElementById('donationValue').value,
         payment: document.getElementById('paymentMethod').value,
         branch: document.getElementById('branch').value,
         date: document.getElementById('date').value,
+        receipt: document.getElementById('receiptNumber').value,
+        book: document.getElementById('bookNumber').value,
       };
-      const { error } = await supabase.from('donations').insert([donation]);
-      if (error) return alert('خطأ أثناء الحفظ: ' + error.message);
+
+      const { error } = await client.from('donations').insert([donation]);
+      if (error) {
+        alert('خطأ أثناء الحفظ: ' + error.message);
+        return;
+      }
+
       donations.push(donation);
       updateTable();
       updateChart();
       updateBranchSummary();
       updateTopStats();
+      updateDonorDetails();
+      updateBranchTotalSummary();
       form.reset();
     });
 
@@ -182,23 +215,34 @@
       tableBody.innerHTML = '';
       donations.forEach(d => {
         const row = document.createElement('tr');
-        row.innerHTML = `<td>${d.donor}</td><td>${d.type}</td><td>${d.value}</td><td>${d.payment}</td><td>${d.branch}</td><td>${d.date}</td>`;
+        row.innerHTML = `<td>${d.donor}</td><td>${d.phone}</td><td>${d.type}</td><td>${d.value}</td><td>${d.payment}</td><td>${d.branch}</td><td>${d.date}</td><td>${d.receipt}</td><td>${d.book}</td>`;
         tableBody.appendChild(row);
+      });
+    }
+
+    function updateDonorDetails() {
+      donorDetailsBody.innerHTML = '';
+      donations.forEach(d => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${d.donor}</td><td>${d.phone}</td><td>${d.value}</td>`;
+        donorDetailsBody.appendChild(row);
       });
     }
 
     function updateChart() {
       const ctx = document.getElementById('donationChart').getContext('2d');
       const typeCounts = { مالي: 0, عيني: 0 };
-      donations.forEach(d => typeCounts[d.type]++);
+      donations.forEach(d => { typeCounts[d.type]++; });
+
       if (window.chart) window.chart.destroy();
       window.chart = new Chart(ctx, {
         type: 'pie',
         data: {
           labels: ['مالي', 'عيني'],
           datasets: [{
+            label: 'أنواع التبرعات',
             data: [typeCounts.مالي, typeCounts.عيني],
-            backgroundColor: ['#27ae60', '#e67e22']
+            backgroundColor: ['#2ecc71', '#e67e22']
           }]
         }
       });
@@ -209,21 +253,46 @@
       donations.forEach(d => {
         const amount = parseFloat(d.value) || 0;
         if (!summary[d.branch]) {
-          summary[d.branch] = { total: 0 };
+          summary[d.branch] = { total: 0, كاش: 0, تحويل: 0, شيك: 0, مصروف: 0 };
         }
-        if (d.type === 'مالي') summary[d.branch].total += amount;
+        if (d.type === 'مالي') {
+          summary[d.branch].total += amount;
+          summary[d.branch][d.payment] += amount;
+        }
       });
+
       summaryList.innerHTML = '';
       for (const [branch, data] of Object.entries(summary)) {
         const li = document.createElement('li');
-        li.innerHTML = `<strong>${branch}</strong>: ${data.total.toFixed(2)} جنيه`;
+        li.innerHTML = `<strong>${branch}</strong><br>
+          الإجمالي: ${data.total.toFixed(2)} جنيه<br>
+          كاش: ${data['كاش'].toFixed(2)} / تحويل: ${data['تحويل'].toFixed(2)}<br>
+          شيك: ${data['شيك'].toFixed(2)} / مصروف: ${data['مصروف'].toFixed(2)}`;
         summaryList.appendChild(li);
+      }
+    }
+
+    function updateBranchTotalSummary() {
+      const branchTotals = {};
+      donations.forEach(d => {
+        const amount = parseFloat(d.value) || 0;
+        if (d.type === 'مالي') {
+          branchTotals[d.branch] = (branchTotals[d.branch] || 0) + amount;
+        }
+      });
+
+      branchTotalSummary.innerHTML = '';
+      for (const [branch, total] of Object.entries(branchTotals)) {
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${branch}</strong>: ${total.toFixed(2)} جنيه`;
+        branchTotalSummary.appendChild(li);
       }
     }
 
     function updateTopStats() {
       const donorTotals = {};
       const branchTotals = {};
+
       donations.forEach(d => {
         const amount = parseFloat(d.value) || 0;
         if (d.type === 'مالي') {
@@ -231,19 +300,16 @@
           branchTotals[d.branch] = (branchTotals[d.branch] || 0) + amount;
         }
       });
+
       const topD = Object.entries(donorTotals).sort((a, b) => b[1] - a[1])[0];
       const topB = Object.entries(branchTotals).sort((a, b) => b[1] - a[1])[0];
+
       topDonor.innerText = topD ? `أعلى متبرع: ${topD[0]} (${topD[1].toFixed(2)} جنيه)` : '';
       topBranch.innerText = topB ? `أكبر فرع: ${topB[0]} (${topB[1].toFixed(2)} جنيه)` : '';
     }
 
-    function showSection(id) {
-      document.querySelectorAll('.content').forEach(div => div.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-    }
-
-    showSection('addDonor');
     loadDonations();
   </script>
+
 </body>
 </html>
