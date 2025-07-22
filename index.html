@@ -3,62 +3,54 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>نظام التبرعات - Supabase</title>
+  <title>نظام التبرعات الخيرية</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
-      margin: 0;
       font-family: Tahoma, sans-serif;
-      background: #fff;
-      direction: rtl;
-    }
-    .container {
+      background: white;
+      margin: 0;
       display: flex;
-      height: 100vh;
     }
     .sidebar {
       width: 250px;
       background: #2c3e50;
       color: white;
+      height: 100vh;
       padding: 20px;
     }
     .sidebar h2 {
-      margin-top: 0;
-      font-size: 22px;
+      margin-bottom: 30px;
+      text-align: center;
     }
     .sidebar button {
       width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      border: none;
+      padding: 10px;
+      margin-bottom: 10px;
       background: #3498db;
+      border: none;
       color: white;
       border-radius: 5px;
       cursor: pointer;
     }
-    .main {
+    .content {
       flex: 1;
       padding: 30px;
-      overflow-y: auto;
-      background: #f4f4f4;
-    }
-    .section {
       display: none;
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    .section.active {
+    .content.active {
       display: block;
     }
-    input, select, button {
-      margin-top: 10px;
+    input, select, button, textarea {
       width: 100%;
       padding: 10px;
-      border: 1px solid #ccc;
+      margin-top: 10px;
       border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    h1, h2 {
+      color: #2c3e50;
     }
     table {
       width: 100%;
@@ -73,100 +65,81 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="sidebar">
-      <h2>القائمة الرئيسية</h2>
-      <button onclick="showSection('donorForm')">➕ إضافة متبرع</button>
-      <button onclick="showSection('donationList')">📋 سجل التبرعات</button>
-      <button onclick="showSection('reports')">📊 التقارير</button>
-    </div>
+  <div class="sidebar">
+    <h2>القائمة الرئيسية</h2>
+    <button onclick="showSection('addDonor')">➕ إضافة متبرع</button>
+    <button onclick="showSection('donorList')">📋 قائمة المتبرعين</button>
+    <button onclick="showSection('donationSummary')">📊 ملخص التبرعات</button>
+  </div>
 
-  <!-- المحتوى الرئيسي -->
-  <div class="content">
+  <div class="content" id="addDonor">
+    <h2>إضافة متبرع جديد</h2>
+    <form id="donationForm">
+      <label>اسم المتبرع:</label>
+      <input type="text" id="donorName" required />
 
-    <h1>نظام التبرعات الخيرية</h1>
+      <label>نوع التبرع:</label>
+      <select id="donationType">
+        <option value="مالي">مالي</option>
+        <option value="عيني">عيني</option>
+      </select>
 
-    <div style="margin: 20px 0;">
-      <label>اختر اسم المتبرع لحذفه:</label>
-      <select id="deleteDonorName"></select>
-      <button onclick="deleteSpecificDonor()" style="background:#c0392b; color:white; margin-top:10px;">
-        🗑 حذف هذا المتبرع
-      </button>
-    </div>
+      <label>القيمة / الوصف:</label>
+      <input type="text" id="donationValue" required />
 
-    <div id="donorFormSection" class="form-section">
-      <h2>إدخال تبرع</h2>
-      <form id="donationForm">
-        <label>اسم المتبرع:</label>
-        <input type="text" id="donorName" required>
+      <label>طريقة الدفع:</label>
+      <select id="paymentMethod">
+        <option value="كاش">كاش</option>
+        <option value="تحويل">تحويل</option>
+        <option value="شيك">شيك</option>
+        <option value="مصروف">مصروف</option>
+      </select>
 
-        <label>نوع التبرع:</label>
-        <select id="donationType">
-          <option value="مالي">مالي</option>
-          <option value="عيني">عيني</option>
-        </select>
+      <label>الفرع:</label>
+      <select id="branch">
+        <option value="حي مكة">حي مكة</option>
+        <option value="أبراج الجامعة">أبراج الجامعة</option>
+        <option value="المنيا الجديدة">المنيا الجديدة</option>
+        <option value="فرع سمالوط">فرع سمالوط</option>
+      </select>
 
-        <label>قيمة / وصف التبرع:</label>
-        <input type="text" id="donationValue" required>
+      <label>تاريخ التبرع:</label>
+      <input type="date" id="date" required />
 
-        <label>طريقة الدفع:</label>
-        <select id="paymentMethod">
-          <option value="كاش">كاش</option>
-          <option value="تحويل">تحويل</option>
-          <option value="شيك">شيك</option>
-          <option value="مصروف">مصروف</option>
-        </select>
+      <button type="submit">💾 حفظ</button>
+    </form>
+  </div>
 
-        <label>الفرع:</label>
-        <select id="branch">
-          <option value="حي مكة">حي مكة</option>
-          <option value="أبراج الجامعة">أبراج الجامعة</option>
-          <option value="المنيا الجديدة">المنيا الجديدة</option>
-          <option value="فرع سمالوط">فرع سمالوط</option>
-        </select>
+  <div class="content" id="donorList">
+    <h2>سجل المتبرعين</h2>
+    <table id="donationTable">
+      <thead>
+        <tr>
+          <th>المتبرع</th>
+          <th>النوع</th>
+          <th>القيمة</th>
+          <th>طريقة الدفع</th>
+          <th>الفرع</th>
+          <th>التاريخ</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
-        <label>تاريخ التبرع:</label>
-        <input type="date" id="date" required>
-
-        <button type="submit">حفظ التبرع</button>
-      </form>
-    </div>
-
-    <div id="donationListSection" class="report-section">
-      <h2>سجل التبرعات</h2>
-      <table id="donationTable">
-        <thead>
-          <tr>
-            <th>المتبرع</th>
-            <th>النوع</th>
-            <th>القيمة</th>
-            <th>طريقة الدفع</th>
-            <th>الفرع</th>
-            <th>التاريخ</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-      <canvas id="donationChart" width="400" height="200"></canvas>
-    </div>
-
-    <div id="summarySection" class="summary-section">
-      <h2>تفصيل التبرعات حسب الفروع</h2>
-      <ul id="branchSummary"></ul>
-    </div>
-
-    <div id="topSection" class="top-section">
-      <h2>أعلى المتبرعين والفروع</h2>
-      <p id="topDonor"></p>
-      <p id="topBranch"></p>
-    </div>
-
+  <div class="content" id="donationSummary">
+    <h2>ملخص التبرعات</h2>
+    <ul id="branchSummary"></ul>
+    <p id="topDonor"></p>
+    <p id="topBranch"></p>
+    <canvas id="donationChart" width="400" height="200"></canvas>
   </div>
 
   <script>
-    const supabaseUrl = 'https://evkjkupolspmyaygtppb.supabase.co';
-    const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2a2prdXBvbHNwbXlheWd0cHBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMxMTUxMDAsImV4cCI6MjA2ODY5MTEwMH0.Mf2ZzhG84cYufTN2Z8AaK1ylxxzAMUPiWTG7aP_clI4'; // ضع المفتاح الكامل
-    const client = supabase.createClient(supabaseUrl, supabaseKey);
+    const supabase = supabase.createClient(
+      'https://evkjkupolspmyaygtppb.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV2a2prdXBvbHNwbXlheWd0cHBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMxMTUxMDAsImV4cCI6MjA2ODY5MTEwMH0.Mf2ZzhG84cYufTN2Z8AaK1ylxxzAMUPiWTG7aP_clI4'
+    );
 
     const form = document.getElementById('donationForm');
     const tableBody = document.querySelector('#donationTable tbody');
@@ -176,36 +149,34 @@
     let donations = [];
 
     async function loadDonations() {
-      const { data, error } = await client.from('donations').select('*');
-      if (error) return alert('خطأ في تحميل التبرعات: ' + error.message);
+      const { data, error } = await supabase.from('donations').select('*');
+      if (error) return alert('خطأ في التحميل: ' + error.message);
       donations = data;
-      updateAll();
-    }
-
-    form.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const donation = {
-        donor: donorName.value,
-        type: donationType.value,
-        value: donationValue.value,
-        payment: paymentMethod.value,
-        branch: branch.value,
-        date: date.value,
-      };
-      const { error } = await client.from('donations').insert([donation]);
-      if (error) return alert('خطأ أثناء الحفظ: ' + error.message);
-      donations.push(donation);
-      updateAll();
-      form.reset();
-    });
-
-    function updateAll() {
       updateTable();
       updateChart();
       updateBranchSummary();
       updateTopStats();
-      updateDonorDropdown();
     }
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const donation = {
+        donor: document.getElementById('donorName').value,
+        type: document.getElementById('donationType').value,
+        value: document.getElementById('donationValue').value,
+        payment: document.getElementById('paymentMethod').value,
+        branch: document.getElementById('branch').value,
+        date: document.getElementById('date').value,
+      };
+      const { error } = await supabase.from('donations').insert([donation]);
+      if (error) return alert('خطأ أثناء الحفظ: ' + error.message);
+      donations.push(donation);
+      updateTable();
+      updateChart();
+      updateBranchSummary();
+      updateTopStats();
+      form.reset();
+    });
 
     function updateTable() {
       tableBody.innerHTML = '';
@@ -227,7 +198,7 @@
           labels: ['مالي', 'عيني'],
           datasets: [{
             data: [typeCounts.مالي, typeCounts.عيني],
-            backgroundColor: ['#2ecc71', '#e67e22']
+            backgroundColor: ['#27ae60', '#e67e22']
           }]
         }
       });
@@ -237,25 +208,22 @@
       const summary = {};
       donations.forEach(d => {
         const amount = parseFloat(d.value) || 0;
-        if (!summary[d.branch]) summary[d.branch] = { total: 0, كاش: 0, تحويل: 0, شيك: 0, مصروف: 0 };
-        if (d.type === 'مالي') {
-          summary[d.branch].total += amount;
-          summary[d.branch][d.payment] += amount;
+        if (!summary[d.branch]) {
+          summary[d.branch] = { total: 0 };
         }
+        if (d.type === 'مالي') summary[d.branch].total += amount;
       });
       summaryList.innerHTML = '';
       for (const [branch, data] of Object.entries(summary)) {
         const li = document.createElement('li');
-        li.innerHTML = `<strong>${branch}</strong><br>
-          الإجمالي: ${data.total.toFixed(2)} جنيه<br>
-          كاش: ${data['كاش'].toFixed(2)} / تحويل: ${data['تحويل'].toFixed(2)}<br>
-          شيك: ${data['شيك'].toFixed(2)} / مصروف: ${data['مصروف'].toFixed(2)}`;
+        li.innerHTML = `<strong>${branch}</strong>: ${data.total.toFixed(2)} جنيه`;
         summaryList.appendChild(li);
       }
     }
 
     function updateTopStats() {
-      const donorTotals = {}, branchTotals = {};
+      const donorTotals = {};
+      const branchTotals = {};
       donations.forEach(d => {
         const amount = parseFloat(d.value) || 0;
         if (d.type === 'مالي') {
@@ -269,35 +237,13 @@
       topBranch.innerText = topB ? `أكبر فرع: ${topB[0]} (${topB[1].toFixed(2)} جنيه)` : '';
     }
 
-    function updateDonorDropdown() {
-      const select = document.getElementById('deleteDonorName');
-      const uniqueDonors = [...new Set(donations.map(d => d.donor))];
-      select.innerHTML = '';
-      uniqueDonors.forEach(name => {
-        const option = document.createElement('option');
-        option.value = name;
-        option.textContent = name;
-        select.appendChild(option);
-      });
-    }
-
-    async function deleteSpecificDonor() {
-      const name = document.getElementById('deleteDonorName').value;
-      if (!confirm(`هل أنت متأكد من حذف جميع التبرعات باسم "${name}"؟`)) return;
-      const { error } = await client.from('donations').delete().eq('donor', name);
-      if (error) return alert('حدث خطأ أثناء الحذف: ' + error.message);
-      donations = donations.filter(d => d.donor !== name);
-      updateAll();
-      alert(`تم حذف جميع التبرعات باسم "${name}"`);
-    }
-
-    loadDonations();
-
-        function showSection(id) {
-      document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+    function showSection(id) {
+      document.querySelectorAll('.content').forEach(div => div.classList.remove('active'));
       document.getElementById(id).classList.add('active');
     }
-  </script>
 
+    showSection('addDonor');
+    loadDonations();
+  </script>
 </body>
 </html>
