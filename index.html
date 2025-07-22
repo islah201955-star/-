@@ -171,7 +171,7 @@
     let donations = [];
 
     async function loadDonations() {
-      const { data, error } = await client.from('donations').select('*');
+    const { data, error } = await supabaseClient.from('donations').select('*');
       if (error) {
         alert('خطأ في تحميل التبرعات: ' + error.message);
         return;
